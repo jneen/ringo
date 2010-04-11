@@ -1,6 +1,6 @@
 module Ringo
   ROOT = File.expand_path(File.dirname(__FILE__))
-  def key(*args)
+  def self.key(*args)
     (['ringo'] + args.map {|a| a.to_s}).join(':')
   end
 end

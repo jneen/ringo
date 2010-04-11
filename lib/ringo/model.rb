@@ -4,22 +4,18 @@ module Ringo
     ## class methods
     class << self
       def field_type(name, klass)
-        self.meta_def(name) do |slug, *options|
+        meta_def(name) do |slug, *options|
           self.fields[slug] = klass.new(self, slug, *options)
         end
       end
 
       def find(id)
-        obj = self.new(:id => id)
-        self.fields.values.each do |field|
-          obj.send("#{field.slug}=", redis.get(obj.key(field.slug)))
-        end
-        obj
+        self.new(:id => id)
       end
       alias [] find
 
       def slug
-        self.class.name.to_underscores.pluralize
+        self.name.to_underscores.pluralize
       end
 
       def key(*args)
@@ -32,12 +28,12 @@ module Ringo
 
     def initialize(attrs={})
       if attrs.include? :id
-        @id = attrs[id]
+        @id = attrs[:id]
         attrs.delete :id
       end
 
       attrs.each do |slug, val|
-        if self.class.fields.include? a
+        if self.class.fields.include? slug
           self.send(:"#{slug}=", val)
         end
       end

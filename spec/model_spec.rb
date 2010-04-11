@@ -1,23 +1,32 @@
 require 'ringo'
 
 describe Ringo::Model, "model" do
+
+  before :all do
+    Ringo.redis.flushdb
+  end
+
   it "makes models" do
     class Foo < Ringo::Model
       string :bar
-      int :baz
     end
 
-    a = Foo.new
+    model = Foo.new
 
-    a.bar.should be_nil
-    a.baz.should be_nil
-    a.id.should be_nil
+    model.bar.should be_nil
+    model.id.should be_a Fixnum
 
-    a.bar = "bar"
-    a.baz = 7
+    model
+    model.bar = "bar"
+    model.bar.should == "bar"
 
-    a.save!
+    model_id = model.id
+    model_id
+    model = Foo[model_id]
 
-    a.id.should be_a Fixnum
+    model.should be_a Foo
+    model.id.should == model_id
+    model.bar.should == "bar"
   end
+
 end

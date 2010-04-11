@@ -15,7 +15,7 @@ class String
     self.dup #TODO
   end
 
-  def pluralize(num)
+  def pluralize(num=0)
     #TODO
     if num == 1
       self
