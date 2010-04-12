@@ -1,11 +1,11 @@
 module Ringo
   class Model
     class StringField < StaticField
-      def get_filter(val)
+      def get_filter(obj, val)
         val.to_s
       end
 
-      def set_filter(val)
+      def set_filter(obj, val)
         val.to_s
       end
     end

@@ -1,18 +1,18 @@
 class String
   def to_underscores!
-    self #TODO
+    self.downcase! #TODO
   end
 
   def to_underscores
-    self.dup #TODO
+    self.dup.to_underscores! #TODO
   end
 
   def to_camel_case!
-    self #TODO
+    self.capitalize! #TODO
   end
 
   def to_camel_case
-    self.dup #TODO
+    self.dup.to_camel_case! #TODO
   end
 
   def pluralize(num=0)

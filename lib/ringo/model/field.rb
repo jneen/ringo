@@ -10,7 +10,8 @@ module Ringo
         Ringo.redis
       end
 
-      def key_for(id)
+      def key_for(obj_or_id)
+        id = (obj_or_id.is_a?(Model) ? obj_or_id.id : obj_or_id)
         @model.key(id, @slug)
       end
     end
