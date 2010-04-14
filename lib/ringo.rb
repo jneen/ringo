@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'active_support/inflector'
+
 module Ringo
   ROOT = File.expand_path(File.dirname(__FILE__))
   def self.key(*args)

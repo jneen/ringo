@@ -28,5 +28,4 @@ describe Ringo::Model, "model" do
     model.id.should == model_id
     model.bar.should == "bar"
   end
-
 end
