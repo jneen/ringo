@@ -60,6 +60,6 @@ module Ringo
   end
 end
 
-require 'ringo/model/field/type/int.rb'
-require 'ringo/model/field/type/string.rb'
-require 'ringo/model/field/type/reference.rb'
+require 'ringo/model/type/int.rb'
+require 'ringo/model/type/string.rb'
+require 'ringo/model/type/reference.rb'
