@@ -1,16 +1,19 @@
 require 'ringo'
 
-describe Ringo::Set do
+describe "Ringo::Set" do
   before :each do
+    pending "implementation"
     Ringo.redis.flushdb
     class Foo < Ringo::Model
       set :bar, :of => :strings
     end
 
     @foo = Foo.new
+
   end
 
   it "starts out empty" do
+    pending "implementation"
     @foo.bar.should be_empty
     @foo.bar.to_a.should == []
     @foo.bar.size.should == 0
@@ -22,6 +25,7 @@ describe Ringo::Set do
   end
 
   it "can add an element" do
+    pending "implementation"
     @foo.bar.add "odelay"
 
     @foo.bar.to_a.should == ["odelay"]
@@ -36,6 +40,7 @@ describe Ringo::Set do
   end
 
   it "is idempotent for a single element" do
+    pending "implementation"
     5.times { @foo.bar.add "odelay" }
 
     @foo.bar.to_a.should == ["odelay"]
@@ -43,6 +48,7 @@ describe Ringo::Set do
   end
 
   it "can add many elements" do
+    pending "implementation"
     (1..10).each do |i|
       @foo.bar.add "odelay#{i}"
     end
@@ -52,6 +58,7 @@ describe Ringo::Set do
   end
 
   it "can grab a random member" do
+    pending "implementation"
     (1..10).each do |i|
       @foo.bar.add "odelay#{i}"
     end
@@ -65,6 +72,7 @@ describe Ringo::Set do
   end
 
   it "can handle custom types" do
+    pending "implementation"
     class MyType < Ringo::Type
       declare_with :my_type
       def get_filter(val)
