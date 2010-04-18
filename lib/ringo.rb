@@ -14,7 +14,7 @@ require File.expand_path(File.join(
 ))
 require File.expand_path(File.join( 
   File.dirname(__FILE__),
-  '../vendor/mock_redis.rb'
+  '../vendor/mock_redis/lib/mock_redis.rb'
 ))
 require 'ringo/core_ext.rb'
 require 'ringo/redis.rb'
