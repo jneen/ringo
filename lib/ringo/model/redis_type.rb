@@ -1,11 +1,19 @@
 module Ringo
   class RedisType
+    def redis
+      Ringo.redis
+    end
+
     def initialize(model, slug, options={})
       @model = model
       @slug = slug
       @type = Ringo.const_get(
         (options[:of] || :strings).singularize.camelcase
       )
+    end
+
+    def key
+      @model.key_for(@slug)
     end
 
     def method_missing(meth, *args, &blk)
