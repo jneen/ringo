@@ -3,7 +3,7 @@ require 'ringo'
 describe "A Ringo List" do
   before :each do
     Ringo.redis.flushdb
-    class Foo
+    class Foo < Ringo::Model
       list :bar, :of => :integers
     end
     @foo = Foo.new
@@ -11,6 +11,7 @@ describe "A Ringo List" do
   end
 
   it "starts out empty" do
+    @foo.bar.count.should == 0
     @foo.bar.should be_empty
     @foo.bar.all.should == []
   end
@@ -27,7 +28,7 @@ describe "A Ringo List" do
     @foo.bar.shift.should == 3
     @ref_foo.bar.shift.should == 4
     @foo.bar.pop.should == 6
-    @ref_foo.all.should == [5]
+    @ref_foo.bar.all.should == [5]
   end
 
   it "looks up by index" do
@@ -44,9 +45,21 @@ describe "A Ringo List" do
       @foo.bar << i
     end
 
-    @foo.to_a.should == [0,1,2,3,4,5,6,7,8,9,10]
-    @foo[0..5].should == [0,1,2,3,4,5]
-    @foo[5..-1].should == [5,6,7,8,9,10]
-    @foo[7..-2].should == [7,8,9]
+    @foo.bar.to_a.should == [0,1,2,3,4,5,6,7,8,9,10]
+    @foo.bar[0..5].should == [0,1,2,3,4,5]
+    @foo.bar[5..-1].should == [5,6,7,8,9,10]
+    @foo.bar[7..-2].should == [7,8,9]
+  end
+
+  it "passes on options" do
+    class Baz < Ringo::Model
+      list :bing, :of => :references, :to => Foo
+    end
+
+    baz = Baz.new
+    baz.bing << @foo
+    baz.bing << @foo
+    baz.bing.count.should == 2
+    baz.bing.all.should == [@foo, @foo]
   end
 end
