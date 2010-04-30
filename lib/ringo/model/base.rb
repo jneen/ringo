@@ -25,8 +25,51 @@ module Ringo
       def last_id
         Ringo.redis[self.key('__id__')].to_i
       end
+
+      def before(sym, options={}, &blk)
+        mth = options[:receives] || :__all__
+        before_hooks[sym] ||= {}
+        before_hooks[sym][mth] ||= []
+        before_hooks[sym][mth] << blk
+        puts before_hooks.inspect
+      end
+
+      def after(sym, options={}, &blk)
+        mth = options[:receives] || :__all__
+        after_hooks[sym] ||= {}
+        after_hooks[sym][mth] ||= []
+        after_hooks[sym][mth] << blk
+      end
+
+      def before_hooks
+        @before_hooks ||= {}
+      end
+
+      def after_hooks
+        @after_hooks ||= {}
+      end
+        
     end
 
+    def run_before_hooks(sym, mth, *args)
+      return unless self.class.before_hooks[sym] && self.class.before_hooks[sym][mth]
+      self.class.before_hooks[sym][mth].each do |blk|
+        blk.call(self, *args)
+      end
+    end
+
+    def run_after_hooks(sym, mth, *args)
+      return unless self.class.before_hooks[sym] && self.class.before_hooks[sym][mth]
+      self.class.before_hooks[sym][mth].each do |blk|
+        blk.call(self, *args)
+      end
+    end
+
+    def with_hooks(sym, mth, *args)
+      self.run_before_hooks(sym, mth, *args)
+      yield if block_given?
+      self.run_after_hooks(sym, mth, *args)
+    end
 
     ## instance methods
 

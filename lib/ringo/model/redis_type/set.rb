@@ -23,7 +23,7 @@ module Ringo
     alias remove delete
 
     def delete?(obj)
-      return nil if self.include?(obj)
+      return nil unless self.include?(obj)
       self.delete(obj)
     end
 
@@ -36,15 +36,18 @@ module Ringo
     def to_set
       Set.new(self.to_a)
     end
+    alias members to_set
+    alias dup to_set
 
-    def intersection(obj)
-      if obj.is_a? RedisSet
+    def intersection(*objects)
+      if objects.all? { |o| o.is_a? RedisSet }
         redis.sinter(self.key, obj.key)
       else
         super
       end
     end
     alias & intersection
+    alias inter intersection
 
     def union(obj)
       if obj.is_a? RedisSet

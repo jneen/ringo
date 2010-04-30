@@ -30,21 +30,32 @@ module Ringo
           type = type_class.new(*opts)
 
           define_method slug do
-            self.instance_variable_get(at_slug) || self.send(fetch_slug)
+            with_hooks slug, :__all__ do
+              self.instance_variable_get(at_slug) || self.send(fetch_slug)
+            end
           end
 
           define_method fetch_slug do
             key = key_for slug
-            redis_val = redis.get(key)
-            return self.instance_variable_set(at_slug, type.default) if redis_val.nil?
-            instance_variable_set(at_slug, type.get_filter(redis_val))
+            ret = nil #closure ftw
+            with_hooks fetch_slug, :__all__ do
+              redis_val = redis.get(key)
+              ret = if redis_val.nil?
+                self.instance_variable_set(at_slug, type.default)
+              else
+                self.instance_variable_set(at_slug, type.get_filter(redis_val))
+              end
+            end
+            ret
           end
 
           define_method slug_equals do |val|
             key = self.key_for slug
-            redis_val = type.set_filter(val)
-            self.redis.set(key, redis_val)
-            self.instance_variable_set(at_slug, type.get_filter(redis_val))
+            with_hooks slug_equals, :all, val do
+              redis_val = type.set_filter(val)
+              self.redis.set(key, redis_val)
+              self.instance_variable_set(at_slug, type.get_filter(redis_val))
+            end
           end
         end
 
