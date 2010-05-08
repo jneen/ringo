@@ -21,14 +21,30 @@ module Ringo
       @type.get_filter(redis.lpop(self.key))
     end
 
-    def [](val)
-      if val.is_a? Range
-        redis.lrange(self.key, val.first, val.last).map do |s|
-          @type.get_filter(s)
-        end
-      elsif val.is_a? Fixnum
-        @type.get_filter(redis.lindex(self.key, val))
+    def slice(one, two=nil)
+      if one.is_a?(Fixnum) && two.nil?
+        return @type.get_filter(redis.lindex(self.key, val))
       end
+
+      range = parse_slice_args(one, two)
+      redis.lrange(self.key, range.first, range.last).map do |s|
+        @type.get_filter(s)
+      end
+    end
+
+
+    def trim!(one, two=nil)
+      range = parse_slice_args(one, two)
+      redis.ltrim(self.key, range.first, range.last)
+      true
+    end
+
+    def first
+      self[0]
+    end
+
+    def last
+      self[-1]
     end
 
     def all
@@ -44,6 +60,8 @@ module Ringo
     def count
       redis.llen(self.key).to_i
     end
+    alias size count
+    alias length count
 
     def empty?
       self.count == 0
@@ -54,6 +72,17 @@ module Ringo
         self.to_a.call(meth, *args, &blk)
       else
         super
+      end
+    end
+
+    private
+    def parse_slice_args(one, two=nil)
+      if one.is_a? Range
+        one
+      elsif one.is_a?(Fixnum) && two.is_a?(Fixnum)
+        one..(one+two)
+      else
+        raise ArgumentError, "invalid arguments #{one.inspect}, #{two.inspect} passed to RedisList#slice"
       end
     end
   end

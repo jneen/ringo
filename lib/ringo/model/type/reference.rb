@@ -1,20 +1,27 @@
 module Ringo
   class Reference < Type
     declare_with :reference
+
     class Error < Type::Error; end
-    def initialize(opts)
+
+    def post_initialize(opts)
       unless opts.include? :to
         raise Error, "Reference doesn't know what to reference!"
       end
 
-      @reference = Ringo.const_get(opts[:to].to_s.camelcase)
-
-      unless @reference.descends_from? Ringo::Model
-        p @reference.superclass
-        raise Error, "Reference expected #{@reference.inspect} to be a Ringo::Model!"
+      if @reference.is_a?(Symbol) || @reference.is_a?(String)
+        @reference = Ringo.const_get(opts[:to].to_s.camelcase)
+      elsif @reference.is_a? Class
+        @reference = opts[:to]
       end
 
-      super
+      unless @reference.try.descends_from?(Ringo::Model)
+        p @reference.superclass
+        raise Error, <<-msg.squish
+          Ringo::Reference expected #{@reference.inspect}
+          to be a Ringo::Model!
+        msg
+      end
     end
 
     def get_filter(val)
@@ -23,7 +30,9 @@ module Ringo
 
     def set_filter(val)
       unless val.is_a? @reference
-        raise Error, "Ringo::Reference expected #{val.inspect} to be a #{@reference}."
+        raise Error, <<-msg.squish
+          Ringo::Reference expected #{val.inspect} to be a #{@reference}!
+        msg
       end
       val.id
     end

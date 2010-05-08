@@ -24,18 +24,13 @@ module Ringo
         # foo.#{name} # => :something
         Model.meta_def name do |slug, *opts|
           slug = slug.to_sym
-          fetch_slug = :"fetch_#{slug}"
           slug_equals = :"#{slug}="
           at_slug = "@#{slug}"
           type = type_class.new(*opts)
 
           define_method slug do
-            self.instance_variable_get(at_slug) || self.send(fetch_slug)
-          end
-
-          define_method fetch_slug do
             key = key_for slug
-            redis_val = redis.get(key)
+            redis_val = Ringo.redis.get(key)
             return self.instance_variable_set(at_slug, type.default) if redis_val.nil?
             instance_variable_set(at_slug, type.get_filter(redis_val))
           end
@@ -43,7 +38,7 @@ module Ringo
           define_method slug_equals do |val|
             key = self.key_for slug
             redis_val = type.set_filter(val)
-            self.redis.set(key, redis_val)
+            Ringo.redis.set(key, redis_val)
             self.instance_variable_set(at_slug, type.get_filter(redis_val))
           end
         end
@@ -55,7 +50,8 @@ module Ringo
     attr_reader :default
 
     def initialize(opts={})
-      @default = opts[:default] || nil
+      @default = opts.delete[:default] || nil
+      try.post_initialize(opts)
     end
   end
 end
