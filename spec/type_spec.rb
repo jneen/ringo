@@ -11,7 +11,7 @@ describe Ringo::Type do
     end
 
     class Baz < Ringo::Model
-      reference :bong, :to => :foo
+      reference :bong, :to => Foo
     end
 
     foo = Foo.new

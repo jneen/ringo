@@ -23,7 +23,7 @@ module Ringo
 
     def slice(one, two=nil)
       if one.is_a?(Fixnum) && two.nil?
-        return @type.get_filter(redis.lindex(self.key, val))
+        return @type.get_filter(redis.lindex(self.key, one))
       end
 
       range = parse_slice_args(one, two)
@@ -31,7 +31,7 @@ module Ringo
         @type.get_filter(s)
       end
     end
-
+    alias [] slice
 
     def trim!(one, two=nil)
       range = parse_slice_args(one, two)
