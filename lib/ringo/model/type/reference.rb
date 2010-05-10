@@ -9,14 +9,13 @@ module Ringo
         raise Error, "Reference doesn't know what to reference!"
       end
 
-      if @reference.is_a?(Symbol) || @reference.is_a?(String)
+      if opts[:to].is_a?(Symbol) || opts[:to].is_a?(String)
         @reference = Ringo.const_get(opts[:to].to_s.camelcase)
-      elsif @reference.is_a? Class
+      elsif opts[:to].is_a? Class
         @reference = opts[:to]
       end
 
       unless @reference.try.descends_from?(Ringo::Model)
-        p @reference.superclass
         raise Error, <<-msg.squish
           Ringo::Reference expected #{@reference.inspect}
           to be a Ringo::Model!

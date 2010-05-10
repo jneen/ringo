@@ -19,27 +19,30 @@ module Ringo
         #   #{name} :bar
         # end
         # foo = Foo.new
-        # foo.#{name} # => type.default
-        # foo.#{name} = :something
-        # foo.#{name} # => :something
-        Model.meta_def name do |slug, *opts|
-          slug = slug.to_sym
-          slug_equals = :"#{slug}="
-          at_slug = "@#{slug}"
+        # foo.bar # => type.default
+        # foo.bar = :something
+        # foo.bar # => :something
+        Model.meta_def name do |attr, *opts|
+          attr = attr.to_sym
+          attr_equals = :"#{attr}="
+          at_attr = "@#{attr}"
           type = type_class.new(*opts)
 
-          define_method slug do
-            key = key_for slug
+          define_method attr do
+            key = self.key(attr)
+            puts "getting #{attr.inspect} from #{key.inspect}"
+            unless Ringo.redis.exists(key)
+              return self.instance_variable_set(at_attr, type.default)
+            end
             redis_val = Ringo.redis.get(key)
-            return self.instance_variable_set(at_slug, type.default) if redis_val.nil?
-            instance_variable_set(at_slug, type.get_filter(redis_val))
+            instance_variable_set(at_attr, type.get_filter(redis_val))
           end
 
-          define_method slug_equals do |val|
-            key = self.key_for slug
+          define_method attr_equals do |val|
+            key = self.key(attr)
             redis_val = type.set_filter(val)
             Ringo.redis.set(key, redis_val)
-            self.instance_variable_set(at_slug, type.get_filter(redis_val))
+            self.instance_variable_set(at_attr, type.get_filter(redis_val))
           end
         end
 
@@ -50,7 +53,7 @@ module Ringo
     attr_reader :default
 
     def initialize(opts={})
-      @default = opts.delete[:default] || nil
+      @default = opts.delete(:default) || nil
       try.post_initialize(opts)
     end
   end

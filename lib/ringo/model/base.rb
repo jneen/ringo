@@ -15,10 +15,6 @@ module Ringo
       def key(*args)
         Ringo.key(self.slug, *args)
       end
-
-      def last_id
-        Ringo.redis[self.key('__id__')].to_i
-      end
     end
 
 
@@ -26,8 +22,7 @@ module Ringo
 
     def initialize(attrs={})
       if attrs.include? :id
-        @id = attrs[:id].to_i
-        attrs.delete :id
+        @id = attrs.delete(:id).to_i
       end
 
       attrs.each do |slug, val|
@@ -38,7 +33,7 @@ module Ringo
     end
 
     def id
-      @id ||= Ringo.redis.incr(self.class.key('__id__')).to_i
+      @id ||= Ringo.redis.incr(self.class.key).to_i
     end
 
     def ==(other)

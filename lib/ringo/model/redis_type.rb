@@ -11,7 +11,7 @@ module Ringo
     end
 
     def key
-      @model.key_for(@slug)
+      @model.key(@slug)
     end
 
     def self.declare_with(*type_names)
