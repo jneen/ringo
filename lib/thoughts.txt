@@ -1,0 +1,34 @@
+keys
+
+class Foo < Ringo::Model
+  class << self
+    group_by :bar, :order_by => :created_at
+    scope :baz do |obj|
+      obj.bar.length > 3
+    end
+  end
+
+  string :zot
+  string :bar, :unique => true
+  unique :string, :bar
+  unique :reference, :zing, :to => Boom
+
+  reference :instructor, :to => User
+  validate :instructor do |instructor|
+    instructor.role >= :instructor
+  end
+
+  unique :instructor/:slug
+
+end
+
+keys:
+
+ringo:models:Foo => id counter
+ringo:models:Foo:objects => scope :all
+ringo:models:foo:objects:1 => set of fields this object has "set"
+ringo:models:Foo:objects:1:bar => "blargh"
+ringo:models:Foo:indices => ?
+ringo:models:Foo:indices:foo => ?
+ringo:models:Foo:indices:foo:blargh => set containing 1 (for Foo[1])
+ringo:models:Foo:scopes:baz => set containing 1, for Foo[1], since "blargh".length == 6 (> 3)
