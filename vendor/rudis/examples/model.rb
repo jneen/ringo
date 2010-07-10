@@ -20,7 +20,7 @@ class Model < Rudis::Base
 
   def initialize(attrs={})
     @id = options.delete(:id)
-    __hash__.merge(attrs)
+    __hash__.merge!(attrs)
   end
 
   def id
